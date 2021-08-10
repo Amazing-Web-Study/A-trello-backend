@@ -1,18 +1,27 @@
 import express from 'express';
+import Connection from './db';
+import {mongoConfig, DatabaseConfigType} from './config/database';
 
 class App {
-  public application: express.Application;
+    public application: express.Application;
+    private database: DatabaseConfigType;
 
-  constructor() {
-    this.application = express();
-    this.router();
-  }
+    constructor() {
+        this.database = mongoConfig()
+        this.application = express();
+        Connection.db = null
+        Connection.url = this.database.host
+        Connection.open().then(r => {
+            console.log(r)
+        })
+        this.router();
+    }
 
-  private router(): void {
-    this.application.get('/', (req: express.Request, res: express.Response) => {
-      res.send('hello!');
-    })
-  }
+    private async router(): Promise<void> {
+        this.application.get('/', (req: express.Request, res: express.Response) => {
+            res.send('hello!');
+        })
+    }
 }
 
 export default App;
