@@ -1,6 +1,6 @@
-import express from 'express';
-import Connection from './db';
-import {mongoConfig, DatabaseConfigType} from './config/database';
+import express from 'express'
+import {mongoConfig, DatabaseConfigType, Connection} from './config/database'
+import router from './router'
 
 class App {
     public application: express.Application;
@@ -14,13 +14,7 @@ class App {
         Connection.open().then(r => {
             console.log(r)
         })
-        this.router();
-    }
-
-    private async router(): Promise<void> {
-        this.application.get('/', (req: express.Request, res: express.Response) => {
-            res.send('hello!');
-        })
+        router(this.application);
     }
 }
 
