@@ -1,17 +1,17 @@
 import express from 'express';
-import Connection from './db';
+import {Connection} from './db';
 import {mongoConfig, DatabaseConfigType} from './config/database';
 
 class App {
     public application: express.Application;
-    private database: DatabaseConfigType;
+    private dbConfig: DatabaseConfigType;
 
     constructor() {
-        this.database = mongoConfig()
+        this.dbConfig = mongoConfig()
         this.application = express();
         Connection.db = null
-        Connection.url = this.database.host
-        Connection.open().then(r => {
+        Connection.url = this.dbConfig.host
+        Connection.open().then((r: any) => {
             console.log(r)
         })
         this.router();
@@ -19,7 +19,10 @@ class App {
 
     private async router(): Promise<void> {
         this.application.get('/', (req: express.Request, res: express.Response) => {
-            res.send('hello!');
+            Connection.collection('cardmodel').find({}).toArray(function (err: any, result: any) {
+                if (err) throw err;
+                res.send(result);
+            })
         })
     }
 }
