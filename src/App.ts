@@ -145,6 +145,21 @@ class App {
                 })
         })
 
+        //list 삭제
+        this.application.delete('/list', (req: express.Request, res: express.Response) => {
+            var ObjectId = require('mongodb').ObjectId
+            const {list_id} = req.body;
+            Connection.collection('list').deleteOne({"_id": ObjectId(list_id)})
+                .then((result: any) => {
+                    console.log(`Success!`)
+                    res.send('success')
+                })
+                .catch((err: any) => {
+                    console.error(`Failed to insert item. id: ${err}`)
+                    res.send('fail')
+                })
+        })
+
         //card 추가
         this.application.post('/card', (req: express.Request, res: express.Response) => {
             var ObjectId = require('mongodb').ObjectId
@@ -202,6 +217,21 @@ class App {
             }
 
             Connection.collection('card').updateOne({"_id": ObjectId(card_id)}, {"$set": card})
+                .then((result: any) => {
+                    console.log(`Success!`)
+                    res.send('success')
+                })
+                .catch((err: any) => {
+                    console.error(`Failed to insert item. id: ${err}`)
+                    res.send('fail')
+                })
+        })
+
+        //card 삭제
+        this.application.delete('/card', (req: express.Request, res: express.Response) => {
+            var ObjectId = require('mongodb').ObjectId
+            const {card_id} = req.body;
+            Connection.collection('card').deleteOne({"_id": ObjectId(card_id)})
                 .then((result: any) => {
                     console.log(`Success!`)
                     res.send('success')
