@@ -122,6 +122,29 @@ class App {
             })
         })
 
+        //list 수정
+        this.application.put('/list', (req: express.Request, res: express.Response) => {
+            var ObjectId = require('mongodb').ObjectId
+            const {list_id, title} = req.body;
+            interface listSchema {
+                title: string,
+            }
+            let list: listSchema;
+            list ={
+                title
+            }
+
+            Connection.collection('list').updateOne({"_id": ObjectId(list_id)}, {"$set": list})
+                .then((result: any) => {
+                    console.log(`Success!`)
+                    res.send('success')
+                })
+                .catch((err: any) => {
+                    console.error(`Failed to insert item. id: ${err}`)
+                    res.send('fail')
+                })
+        })
+
         //card 추가
         this.application.post('/card', (req: express.Request, res: express.Response) => {
             var ObjectId = require('mongodb').ObjectId
@@ -162,6 +185,31 @@ class App {
                 if (err) throw err;
                 res.send(result);
             })
+        })
+
+        //card 수정
+        this.application.put('/card', (req: express.Request, res: express.Response) => {
+            var ObjectId = require('mongodb').ObjectId
+            const {card_id, title, description} = req.body;
+            interface cardSchema {
+                title: string,
+                description: string,
+            }
+            let card: cardSchema;
+            card ={
+                title,
+                description
+            }
+
+            Connection.collection('card').updateOne({"_id": ObjectId(card_id)}, {"$set": card})
+                .then((result: any) => {
+                    console.log(`Success!`)
+                    res.send('success')
+                })
+                .catch((err: any) => {
+                    console.error(`Failed to insert item. id: ${err}`)
+                    res.send('fail')
+                })
         })
     }
 }
