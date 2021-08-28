@@ -40,9 +40,7 @@ class App {
                 name
             }
 
-            const existUser = Connection.collection('user').findOne({
-                id
-            })
+            const existUser = Connection.collection('user').findOne({id})
             existUser.then((doc: any) => {
                 if(!doc) {
                     Connection.collection('user').insertOne(user)
@@ -57,6 +55,30 @@ class App {
     
                 }
                 else res.send('already user exists')
+            })
+        })
+
+        this.application.post('/login', (req: express.Request, res: express.Response) => {
+            const {id, password} = req.body;
+            interface loginSchema {
+                id: string,
+                password: string
+            }
+            let login: loginSchema;
+            login ={
+                id,
+                password
+            }
+
+            const existUser = Connection.collection('user').findOne({id})
+            existUser.then((doc: any) => {
+                if(!doc) {
+                    res.send('id를 확인하세요')
+                }
+                else {
+                    if(doc.password === login.password) res.send('login success')
+                    else res.send('비밀번호를 확인하세요')
+                }
             })
         })
     }
