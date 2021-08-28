@@ -83,7 +83,7 @@ class App {
         })
 
         this.application.post('/list', (req: express.Request, res: express.Response) => {
-            const {title} = req.body;
+            const {userid, title} = req.body;
             interface listSchema {
                 title: string,
             }
@@ -93,8 +93,17 @@ class App {
             }
             Connection.collection('list').insertOne(list)
                 .then((result: any) => {
-                    console.log(`Success! id: ${result.insertedId}`)
-                    res.send('success')
+                    var list_id = result.insertedId
+                    const updateUser = Connection.collection('user').findOneAndUpdate({id: userid},{"$push" : {list_id}})
+                    updateUser.then((doc: any) => {
+                        if(!doc) {
+                            res.send('id를 확인하세요')
+                        }
+                        else {
+                            console.log(`Success! id: ${result.insertedId}`)
+                            res.send('success')
+                        }
+                    })
                 })
                 .catch((err: any) => {
                     console.error(`Failed to insert list. id: ${err}`)
