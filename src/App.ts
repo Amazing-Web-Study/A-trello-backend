@@ -114,6 +114,14 @@ class App {
                 })
         })
 
+        //list get
+        this.application.get('/list', (req: express.Request, res: express.Response) => {
+            Connection.collection('list').find({}).toArray(function (err: any, result: any) {
+                if (err) throw err;
+                res.send(result);
+            })
+        })
+
         //card 추가
         this.application.post('/card', (req: express.Request, res: express.Response) => {
             var ObjectId = require('mongodb').ObjectId
@@ -146,6 +154,14 @@ class App {
                     console.error(`Failed to insert card. id: ${err}`)
                     res.send('fail')
                 })
+        })
+
+        //card get
+        this.application.get('/card', (req: express.Request, res: express.Response) => {
+            Connection.collection('card').find({}).toArray(function (err: any, result: any) {
+                if (err) throw err;
+                res.send(result);
+            })
         })
     }
 }
