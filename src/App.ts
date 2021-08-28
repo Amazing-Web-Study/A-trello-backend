@@ -81,6 +81,26 @@ class App {
                 }
             })
         })
+
+        this.application.post('/list', (req: express.Request, res: express.Response) => {
+            const {title} = req.body;
+            interface listSchema {
+                title: string,
+            }
+            let list: listSchema;
+            list ={
+                title
+            }
+            Connection.collection('list').insertOne(list)
+                .then((result: any) => {
+                    console.log(`Success! id: ${result.insertedId}`)
+                    res.send('success')
+                })
+                .catch((err: any) => {
+                    console.error(`Failed to insert list. id: ${err}`)
+                    res.send('fail')
+                })
+        })
     }
 }
 
