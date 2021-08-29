@@ -26,6 +26,7 @@ export function mongoConfig(): DatabaseConfigType {
     }
 }
 
+
 const MongoClient = require('mongodb').MongoClient
 
 export class Connection {
@@ -38,10 +39,108 @@ export class Connection {
             console.log(e)
         })
         this.db = mongoClient.db(process.env.DB_NAME)
+
+        const cardListCollection = Connection.collection('cardList')
+        const userCollection = Connection.collection('user')
+        const tokenCollection = Connection.collection('token')
+
+        if (!cardListCollection) {
+            this.createCardListCollection()
+        }
+        if(!userCollection){
+            this.createUserCollection()
+        }
+        if(!tokenCollection){
+            this.createTokenCollection()
+        }
+
         return this.db
     }
 
-    static collection (collectionName:string) {
+    static collection(collectionName: string) {
         return this.db.collection(collectionName)
+    }
+    static createTokenCollection() {
+        return this.db.createCollection('token', {
+            validator: {
+                $jsonSchema: {
+                    bsonType: "object",
+                    required: ["id", "name"],
+                    properties: {
+                        id: {
+                            bsonType: "string",
+                            description: "must be a string and is required"
+                        },
+                        name: {
+                            bsonType: "string",
+                            description: "must be a string and is required"
+                        }
+                    }
+                }
+            },
+            validationLevel: "moderate"
+        })
+    }
+    static createUserCollection() {
+        return this.db.createCollection('user', {
+            validator: {
+                $jsonSchema: {
+                    bsonType: "object",
+                    required: ["title"],
+                    properties: {
+                        id: {
+                            bsonType: "string",
+                            description: "must be a string and is required"
+                        },
+                        password: {
+                            bsonType: "string",
+                            description: "must be a string and is required"
+                        },
+                        name: {
+                            bsonType: "string",
+                            description: "must be a string and is required"
+                        }
+                    }
+                }
+            },
+            validationLevel: "moderate"
+        })
+    }
+    static createCardListCollection() {
+        return this.db.createCollection('cardList', {
+            validator: {
+                $jsonSchema: {
+                    bsonType: "object",
+                    required: ["title", "authorId"],
+                    properties: {
+                        title: {
+                            bsonType: "string",
+                            description: "must be a string and is required"
+                        },
+                        authorId: {
+                            bsonType: "objectId",
+                            description: "must be a object id and is required"
+                        },
+                        cardList: {
+                            bsonType: "object",
+                            required: ["title", "description"],
+                            description: "must be a object",
+                            properties: {
+                                title: {
+                                    bsonType: "string",
+                                    description: "must be a string and is required"
+                                },
+                                description: {
+                                    bsonType: "string",
+                                    description: "must be a string and is required"
+                                }
+                            },
+                            autoIndexId: true
+                        }
+                    }
+                }
+            },
+            validationLevel: "moderate"
+        })
     }
 }
