@@ -2,6 +2,7 @@ import express from 'express';
 import {Connection} from './db';
 import {mongoConfig, DatabaseConfigType} from './config/database';
 import {ObjectId} from "mongodb";
+import cors from 'cors';
 
 class App {
     public application: express.Application;
@@ -10,6 +11,7 @@ class App {
     constructor() {
         this.dbConfig = mongoConfig()
         this.application = express();
+        this.application.use(cors( ));
         this.application.use(express.json());
         this.application.use(express.urlencoded({extended: false}));
         Connection.db = null
@@ -58,12 +60,6 @@ class App {
                 res.send("don't find user token")
             })
         })
-        this.application.get('/user/', (req: express.Request, res: express.Response) => {
-            Connection.collection('user').find({}).toArray(function (err: any, result: any) {
-                if (err) throw err;
-                res.send(result);
-            })
-        })
         this.application.post('/user/', (req: express.Request, res: express.Response) => {
             const insertUser = {
                 id: req.body.id,
@@ -78,6 +74,7 @@ class App {
         })
         this.application.get('/list/', (req: express.Request, res: express.Response) => {
             Connection.collection('cardList').find({}).toArray(function (err: any, result: any) {
+                console.log(err)
                 if (err) throw err;
                 res.send(result);
             })
