@@ -11,7 +11,7 @@ class App {
     constructor() {
         this.dbConfig = mongoConfig()
         this.application = express();
-        this.application.use(cors( ));
+        this.application.use(cors());
         this.application.use(express.json());
         this.application.use(express.urlencoded({extended: false}));
         Connection.db = null
@@ -29,7 +29,7 @@ class App {
                 password: req.body.password
             }
             Connection.collection('user').findOne(loginData).then((findDocument: any) => {
-                if(findDocument){
+                if (findDocument) {
                     const tokenData = {
                         _id: findDocument._id,
                         id: findDocument.id,
@@ -50,7 +50,7 @@ class App {
                 _id: new ObjectId(req.body.token)
             }
             Connection.collection('token').findOne(tokenData).then((findDocument: any) => {
-                if(findDocument){
+                if (findDocument) {
                     res.send(findDocument)
                 } else {
                     throw findDocument;
@@ -91,7 +91,7 @@ class App {
             })
         })
         this.application.delete('/list/:listId/', (req: express.Request, res: express.Response) => {
-            const query = { _id: new ObjectId(req.params.listId) }
+            const query = {_id: new ObjectId(req.params.listId)}
             const options = {
                 justOne: true,
             }
@@ -102,7 +102,7 @@ class App {
             })
         })
         this.application.post('/list/:listId/card', async (req: express.Request, res: express.Response) => {
-            const query = { _id: new ObjectId(req.params.listId) }
+            const query = {_id: new ObjectId(req.params.listId)}
             const insertCard = {
                 "$push": {
                     "cardList": {
@@ -122,8 +122,31 @@ class App {
                 res.send(err)
             })
         })
+        this.application.put('/list/:listId/:cardId', (req: express.Request, res: express.Response) => {
+            const query = {
+                _id: new ObjectId(req.params.listId),
+                "cardList._id": new ObjectId(req.params.cardId)
+            }
+            const upsetCard = {
+                "$set": {
+                    ...req.body.title ? {
+                        "cardList.$.title": req.body.title,
+                    } : {},
+                    ...req.body.description ? {
+                        "cardList.$.description": req.body.description
+                    } : {}
+                }
+            }
+            const options = {returnNewDocument: true};
+            Connection.collection('cardList').findOneAndUpdate(query, upsetCard, options).then((deleteCard: any) => {
+                res.send(deleteCard)
+            }).catch((err: any) => {
+                res.status(500)
+                res.send(err)
+            })
+        })
         this.application.delete('/list/:listId/:cardId', (req: express.Request, res: express.Response) => {
-            const query = { _id: new ObjectId(req.params.listId) }
+            const query = {_id: new ObjectId(req.params.listId)}
             const upsetCard = {
                 "$pull": {
                     "cardList": {
