@@ -90,6 +90,25 @@ class App {
                 res.send(err)
             })
         })
+        this.application.put('/list/:listId/', (req: express.Request, res: express.Response) => {
+            const query = {
+                _id: new ObjectId(req.params.listId)
+            }
+            const upsetCard = {
+                "$set": {
+                    ...req.body.title ? {
+                        "title": req.body.title,
+                    } : {},
+                }
+            }
+            const options = {returnNewDocument: true};
+            Connection.collection('cardList').findOneAndUpdate(query, upsetCard, options).then((deleteCard: any) => {
+                res.send(deleteCard)
+            }).catch((err: any) => {
+                res.status(500)
+                res.send(err)
+            })
+        })
         this.application.delete('/list/:listId/', (req: express.Request, res: express.Response) => {
             const query = {_id: new ObjectId(req.params.listId)}
             const options = {
