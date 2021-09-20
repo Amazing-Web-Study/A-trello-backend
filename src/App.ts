@@ -112,6 +112,48 @@ class App {
                 res.send(err)
             })
         })
+
+        this.application.delete('/list/:listId', (req: express.Request, res: express.Response) => {
+            const query = { _id: new ObjectId(req.params.listId) }
+            console.log(query)
+            Connection.collection('cardList').deleteOne(query)
+                .then((result: any) => {
+                    console.log(`Success!`)
+                    res.send('success')
+                })
+                .catch((err: any) => {
+                    console.error(`Failed to delete item. id: ${err}`)
+                    res.send('fail')
+                })
+        })
+
+        this.application.put('/list/:listId/:cardId', (req: express.Request, res: express.Response) => {
+            const {title} = req.body;
+            const query = { _id: new ObjectId(req.params.listId) }
+            const cardId = parseInt(req.params.cardId)
+            interface listSchema {
+                title: string,
+            }
+            let list: listSchema;
+            list ={
+                title
+            }
+
+            var cardList: Array<Object> = []
+            Connection.collection('cardList').find(query).toArray(function (err: any, result: any) {
+                cardList = result[0].cardList;
+                cardList.splice(cardId, 1)
+                Connection.collection('cardList').updateOne(query, {"$set": {cardList}})
+                    .then((result: any) => {
+                        console.log(`Success!`)
+                        res.send('success')
+                    })
+                    .catch((err: any) => {
+                        console.error(`Failed to insert item. id: ${err}`)
+                        res.send('fail')
+                    })
+            })
+        })
     }
 }
 
